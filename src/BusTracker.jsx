@@ -7,19 +7,376 @@ import { Threebox } from "threebox-plugin"; // The bridge between Mapbox and Thr
 // Token setup
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 
+// Marker data
+const markers = [
+  { name: "BUP", coords: [90.35763768635113, 23.839868716065457] },
+  { name: "DOHS Gate", coords: [90.375689, 23.837502] },
+  { name: "ECB Canteen", coords: [90.376886, 23.830213] },
+  { name: "Kalshi More", coords: [90.37808, 23.823153] },
+  { name: "ECB Chattor", coords: [90.393616, 23.822571] },
+  { name: "Matikata Checkpost", coords: [90.397141, 23.81857] },
+  { name: "CMH", coords: [90.400347, 23.8138] },
+  { name: "Cantonment Post Office", coords: [90.3942, 23.799306] },
+  { name: "Adomjee Cantonment College", coords: [90.392953, 23.795108] },
+  { name: "Workshop", coords: [90.391234, 23.788422] },
+  { name: "Jahangir Gate", coords: [90.390039, 23.775774] },
+];
+
+// Bus Routes
+const routeGeoJSON = {
+  type: "Feature",
+  properties: {},
+  geometry: {
+    type: "LineString",
+    coordinates: [
+      [90.357906, 23.839886],
+      [90.357942, 23.839412],
+      [90.358304, 23.839449],
+      [90.358357, 23.839146],
+      [90.358436, 23.838613],
+      [90.35847, 23.838388],
+      [90.35858, 23.83749],
+      [90.358619, 23.83719],
+      [90.358661, 23.836873],
+      [90.358945, 23.836895],
+      [90.359262, 23.836914],
+      [90.359615, 23.836956],
+      [90.359948, 23.836996],
+      [90.36046, 23.837073],
+      [90.360931, 23.837133],
+      [90.361071, 23.837169],
+      [90.361151, 23.837215],
+      [90.361259, 23.837276],
+      [90.361365, 23.837302],
+      [90.361484, 23.837331],
+      [90.361641, 23.837331],
+      [90.361789, 23.837323],
+      [90.362198, 23.837275],
+      [90.362629, 23.837219],
+      [90.363294, 23.837193],
+      [90.363375, 23.83723],
+      [90.36345, 23.837243],
+      [90.36351, 23.837256],
+      [90.363596, 23.837275],
+      [90.363881, 23.837269],
+      [90.364484, 23.837298],
+      [90.364608, 23.837291],
+      [90.364844, 23.837271],
+      [90.365998, 23.837318],
+      [90.366289, 23.837329],
+      [90.367253, 23.837368],
+      [90.369087, 23.837441],
+      [90.369258, 23.837473],
+      [90.369336, 23.837486],
+      [90.370195, 23.837516],
+      [90.37034, 23.837498],
+      [90.371266, 23.837539],
+      [90.372287, 23.837565],
+      [90.372412, 23.837609],
+      [90.373319, 23.837668],
+      [90.37414, 23.837735],
+      [90.374288, 23.837716],
+      [90.374682, 23.83774],
+      [90.374741, 23.837738],
+      [90.374883, 23.837718],
+      [90.375135, 23.837681],
+      [90.37525, 23.837652],
+      [90.375383, 23.83761],
+      [90.375548, 23.837545],
+      [90.375704, 23.837464],
+      [90.375704, 23.837464],
+      [90.375821, 23.837406],
+      [90.37591, 23.837355],
+      [90.376043, 23.83724],
+      [90.376092, 23.837196],
+      [90.376119, 23.837177],
+      [90.37616, 23.837134],
+      [90.376212, 23.837092],
+      [90.376267, 23.837041],
+      [90.376313, 23.836976],
+      [90.37636, 23.83691],
+      [90.376406, 23.836821],
+      [90.376446, 23.836703],
+      [90.376471, 23.836534],
+      [90.376504, 23.836269],
+      [90.376548, 23.835817],
+      [90.376559, 23.835659],
+      [90.376564, 23.835593],
+      [90.376569, 23.835522],
+      [90.376597, 23.835138],
+      [90.376618, 23.835024],
+      [90.376673, 23.83484],
+      [90.376704, 23.834744],
+      [90.376718, 23.834671],
+      [90.376724, 23.834612],
+      [90.376685, 23.833978],
+      [90.376708, 23.833552],
+      [90.376724, 23.833288],
+      [90.376763, 23.832515],
+      [90.376784, 23.832174],
+      [90.376831, 23.830506],
+      [90.376854, 23.830266],
+      [90.376865, 23.830187],
+      [90.376865, 23.830187],
+      [90.376893, 23.83006],
+      [90.376964, 23.829799],
+      [90.376989, 23.829687],
+      [90.3771, 23.829171],
+      [90.377308, 23.828174],
+      [90.377321, 23.828083],
+      [90.377366, 23.827714],
+      [90.37737, 23.827487],
+      [90.377367, 23.82706],
+      [90.377391, 23.826516],
+      [90.37744, 23.825958],
+      [90.377471, 23.825778],
+      [90.377528, 23.825389],
+      [90.377613, 23.824918],
+      [90.377806, 23.823603],
+      [90.377838, 23.823423],
+      [90.377866, 23.823343],
+      [90.377891, 23.823283],
+      [90.377929, 23.823221],
+      [90.377975, 23.823176],
+      [90.378019, 23.823147],
+      [90.378078, 23.823127],
+      [90.378127, 23.823123],
+      [90.378228, 23.823125],
+      [90.378329, 23.823138],
+      [90.378967, 23.823263],
+      [90.37927, 23.823332],
+      [90.379374, 23.823369],
+      [90.379467, 23.823414],
+      [90.379754, 23.823527],
+      [90.379865, 23.823553],
+      [90.379968, 23.823564],
+      [90.380112, 23.823569],
+      [90.380223, 23.82356],
+      [90.380309, 23.823547],
+      [90.380397, 23.823524],
+      [90.380487, 23.82349],
+      [90.380629, 23.823423],
+      [90.380832, 23.823297],
+      [90.381163, 23.823067],
+      [90.381392, 23.822888],
+      [90.382013, 23.822514],
+      [90.382266, 23.822348],
+      [90.382593, 23.822109],
+      [90.382926, 23.821854],
+      [90.38342, 23.821483],
+      [90.383568, 23.821386],
+      [90.384063, 23.821057],
+      [90.384215, 23.820966],
+      [90.38435, 23.82088],
+      [90.38451, 23.820805],
+      [90.384709, 23.820737],
+      [90.38529, 23.820595],
+      [90.385515, 23.820549],
+      [90.386388, 23.820377],
+      [90.387802, 23.820089],
+      [90.388055, 23.820057],
+      [90.388287, 23.820042],
+      [90.388387, 23.820044],
+      [90.388465, 23.820044],
+      [90.388751, 23.82006],
+      [90.388958, 23.820083],
+      [90.389198, 23.82012],
+      [90.3897, 23.820203],
+      [90.389957, 23.820278],
+      [90.390047, 23.820321],
+      [90.390138, 23.820367],
+      [90.390255, 23.820461],
+      [90.390786, 23.820936],
+      [90.39127, 23.821422],
+      [90.391404, 23.821519],
+      [90.391855, 23.821803],
+      [90.392328, 23.822095],
+      [90.392733, 23.822357],
+      [90.39293, 23.822461],
+      [90.393364, 23.822672],
+      [90.393394, 23.822685],
+      [90.393427, 23.82269],
+      [90.39346, 23.822688],
+      [90.393498, 23.822674],
+      [90.39353, 23.82265],
+      [90.393551, 23.822619],
+      [90.393562, 23.822583],
+      [90.393583, 23.822552],
+      [90.393731, 23.822335],
+      [90.393868, 23.822144],
+      [90.394143, 23.821832],
+      [90.394522, 23.821474],
+      [90.394878, 23.821103],
+      [90.395255, 23.820662],
+      [90.395514, 23.820358],
+      [90.395599, 23.820311],
+      [90.39566, 23.820258],
+      [90.396268, 23.819572],
+      [90.397139, 23.818568],
+      [90.39723, 23.818463],
+      [90.397577, 23.818065],
+      [90.397719, 23.817896],
+      [90.398144, 23.817336],
+      [90.398303, 23.817166],
+      [90.398373, 23.817111],
+      [90.398437, 23.817053],
+      [90.3986, 23.816967],
+      [90.398762, 23.816896],
+      [90.399271, 23.81674],
+      [90.399765, 23.816599],
+      [90.400014, 23.816544],
+      [90.40019, 23.816523],
+      [90.400214, 23.817137],
+      [90.400214, 23.817137],
+      [90.400299, 23.817877],
+      [90.400391, 23.818459],
+      [90.400362, 23.81883],
+      [90.400311, 23.819175],
+      [90.400243, 23.819406],
+      [90.400183, 23.819611],
+      [90.399942, 23.820308],
+      [90.399882, 23.820405],
+      [90.399835, 23.82043],
+      [90.399803, 23.82047],
+      [90.399791, 23.820519],
+      [90.399801, 23.820567],
+      [90.399831, 23.820609],
+      [90.39988, 23.820636],
+      [90.399937, 23.820643],
+      [90.399992, 23.820626],
+      [90.400034, 23.82059],
+      [90.400056, 23.820541],
+      [90.400053, 23.820488],
+      [90.400026, 23.820443],
+      [90.400005, 23.820427],
+      [90.400021, 23.820324],
+      [90.400115, 23.820058],
+      [90.400173, 23.819894],
+      [90.40032, 23.819428],
+      [90.400435, 23.819085],
+      [90.400467, 23.818853],
+      [90.400485, 23.818474],
+      [90.400462, 23.8182],
+      [90.400394, 23.817904],
+      [90.40034, 23.817539],
+      [90.400316, 23.817126],
+      [90.400283, 23.81652],
+      [90.400281, 23.816337],
+      [90.400277, 23.81585],
+      [90.400275, 23.815616],
+      [90.400302, 23.814916],
+      [90.400304, 23.814869],
+      [90.400304, 23.814042],
+      [90.400307, 23.81396],
+      [90.400323, 23.813798],
+      [90.400304, 23.813677],
+      [90.400283, 23.813572],
+      [90.400234, 23.813383],
+      [90.400161, 23.813152],
+      [90.399964, 23.812446],
+      [90.399687, 23.811668],
+      [90.399435, 23.8109],
+      [90.399392, 23.810708],
+      [90.399373, 23.810618],
+      [90.399331, 23.810416],
+      [90.399204, 23.809627],
+      [90.399135, 23.808798],
+      [90.399044, 23.8079],
+      [90.398923, 23.806708],
+      [90.398856, 23.806427],
+      [90.398773, 23.806135],
+      [90.398706, 23.805959],
+      [90.398623, 23.805762],
+      [90.398539, 23.805597],
+      [90.398453, 23.805443],
+      [90.397919, 23.80465],
+      [90.397802, 23.804478],
+      [90.397662, 23.804307],
+      [90.397563, 23.804184],
+      [90.397501, 23.804115],
+      [90.397102, 23.803749],
+      [90.396389, 23.803062],
+      [90.395152, 23.801892],
+      [90.395031, 23.801769],
+      [90.394967, 23.801671],
+      [90.394793, 23.801354],
+      [90.394634, 23.801049],
+      [90.394213, 23.800048],
+      [90.394181, 23.799937],
+      [90.394015, 23.799414],
+      [90.393999, 23.799345],
+      [90.393881, 23.798836],
+      [90.393599, 23.797857],
+      [90.393331, 23.796908],
+      [90.393173, 23.796406],
+      [90.393158, 23.79634],
+      [90.393146, 23.796285],
+      [90.393065, 23.795918],
+      [90.392968, 23.795475],
+      [90.392958, 23.795445],
+      [90.393018, 23.795404],
+      [90.393035, 23.795355],
+      [90.393039, 23.795305],
+      [90.393035, 23.795261],
+      [90.39301, 23.795156],
+      [90.392996, 23.795099],
+      [90.392986, 23.795061],
+      [90.392964, 23.794999],
+      [90.392944, 23.794953],
+      [90.392914, 23.79492],
+      [90.392878, 23.794903],
+      [90.392827, 23.794904],
+      [90.392652, 23.794271],
+      [90.392545, 23.793852],
+      [90.39232, 23.792568],
+      [90.392137, 23.791405],
+      [90.392089, 23.791187],
+      [90.391998, 23.790894],
+      [90.391856, 23.790526],
+      [90.391813, 23.790437],
+      [90.391317, 23.789132],
+      [90.391272, 23.788977],
+      [90.391205, 23.788677],
+      [90.391186, 23.788585],
+      [90.391161, 23.788432],
+      [90.391114, 23.788145],
+      [90.391057, 23.787831],
+      [90.391009, 23.787613],
+      [90.39094, 23.787388],
+      [90.390866, 23.787149],
+      [90.390143, 23.785087],
+      [90.390035, 23.784785],
+      [90.389789, 23.784015],
+      [90.389695, 23.783671],
+      [90.389617, 23.783379],
+      [90.389569, 23.783075],
+      [90.389523, 23.782709],
+      [90.389485, 23.782191],
+      [90.389456, 23.781249],
+      [90.389421, 23.780302],
+      [90.389455, 23.77916],
+      [90.389501, 23.778692],
+      [90.389569, 23.778224],
+      [90.389695, 23.77723],
+      [90.389894, 23.775758],
+    ],
+  },
+};
+
 const BusTracker = () => {
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
   const busModelRef = useRef(null); // To store the 3D bus instance
+  const animationRef = useRef(null); // To store animation frame ID
 
   // Example: Starting coordinates (Dhaka coordinates)
-  const startCoords = [90.4125, 23.8103];
+  const startCoords = routeGeoJSON.geometry.coordinates[0];
 
   useEffect(() => {
     // 1. Initialize Map
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
-      style: "mapbox://styles/mapbox/streets-v12", // Lighter styles make 3D models pop
+      style: "mapbox://styles/mapbox/standard", // Lighter styles make 3D models pop
       center: startCoords,
       zoom: 18,
       pitch: 60, // Important: Tilt the map so you can see the 3D effect!
@@ -30,6 +387,40 @@ const BusTracker = () => {
     mapRef.current = map;
 
     map.on("style.load", () => {
+      // Add the route line for visualization
+      map.addSource("route", {
+        type: "geojson",
+        data: routeGeoJSON,
+      });
+
+      map.addLayer({
+        id: "route",
+        type: "line",
+        source: "route",
+        paint: {
+          "line-color": "#007cbf",
+          "line-width": 5,
+        },
+      });
+
+      // Add Markers
+      markers.forEach((markerInfo) => {
+        // Create a popup that doesn't close
+        const popup = new mapboxgl.Popup({
+          offset: 25,
+          closeButton: false,
+          closeOnClick: false,
+        }).setText(markerInfo.name);
+
+        // Create the marker and toggle its popup
+        const marker = new mapboxgl.Marker({ color: "#FF0000" })
+          .setLngLat(markerInfo.coords)
+          .setPopup(popup)
+          .addTo(map);
+
+        marker.togglePopup();
+      });
+
       // 2. Add the Custom Layer for the 3D Model
       map.addLayer({
         id: "3d-bus-layer",
@@ -43,21 +434,24 @@ const BusTracker = () => {
           const options = {
             obj: "/models/bus.glb", // Path to your file in public folder
             type: "gltf",
-            scale: { x: 0.1, y: 0.1, z: 0.1 }, // Adjust scale if bus is too huge/tiny
+            scale: { x: 0.04, y: 0.04, z: 0.04 }, // Adjust scale if bus is too huge/tiny
             units: "meters", // Ensures it stays realistic size at all zoom levels
-            rotation: { x: 90, y: 90, z: 0 }, // Adjust to fix initial model orientation
+            rotation: { x: -90, y: 0, z: 180 }, // Corrected orientation
             anchor: "center",
           };
 
           window.tb.loadObj(options, (model) => {
             model.setCoords(startCoords);
-            model.setRotation({ x: 0, y: 0, z: 0 }); // Initial rotation
+            // model.setRotation({ x: 0, y: 0, z: 0 }); // Initial rotation - REMOVED
 
             // Add tooltip (optional)
             model.addTooltip("Bus #123", true);
 
             window.tb.add(model);
             busModelRef.current = model; // Save reference to animate later
+
+            // Start the animation
+            animateBus();
           });
         },
 
@@ -67,58 +461,66 @@ const BusTracker = () => {
       });
     });
 
-    return () => map.remove();
+    return () => {
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
+      map.remove();
+    };
   }, []);
 
   // ---------------------------------------------------------
   // FUNCTION TO MOVE THE BUS SMOOTHLY
   // ---------------------------------------------------------
-  const moveBusTo = (newCoords) => {
-    if (!busModelRef.current || !mapRef.current) return;
+  const animateBus = () => {
+    const lineDistance = turf.length(routeGeoJSON);
+    const steps = 8000;
+    const arc = [];
 
-    const bus = busModelRef.current;
-    const previousCoords = bus.coordinates; // Get current [lng, lat]
+    for (let i = 0; i < lineDistance; i += lineDistance / steps) {
+      const segment = turf.along(routeGeoJSON, i);
+      arc.push(segment.geometry.coordinates);
+    }
 
-    // 1. Calculate the rotation (Bearing) so bus faces the destination
-    // Uses Turf.js to calculate angle between two points
-    const from = turf.point(previousCoords);
-    const to = turf.point(newCoords);
-    const bearing = turf.bearing(from, to);
+    let counter = 0;
 
-    // 2. Animate Position and Rotation
-    // Threebox has built-in animation, but for full control we often set options
-    // setCoords(lnglat) moves it instantly, so we need a loop or use Threebox's internal tools.
-    // However, Threebox objects have a `.setCoords` that updates position.
+    function animate() {
+      if (counter < arc.length - 1) {
+        const currentCoord = arc[counter];
+        const nextCoord = arc[counter + 1];
 
-    // Simplest Smooth Animation approach:
-    // Update the bus properties. Threebox will render the change.
-    // For true "Uber-like" gliding, you would typically interpolate this over time (e.g. 1000ms)
+        if (busModelRef.current) {
+          busModelRef.current.setCoords(currentCoord);
 
-    bus.setCoords(newCoords);
+          const bearing = turf.bearing(
+            turf.point(currentCoord),
+            turf.point(nextCoord),
+          );
 
-    // Rotate the bus on the Z axis to face the road
-    // Note: You might need to add/subtract 90 or 180 depending on your 3D model's native facing
-    bus.setRotation({ x: 0, y: 0, z: bearing });
+          // CORRECTION:
+          // 1. "270" (or -90) orients the West-facing (-X) model to North (0 deg).
+          // 2. "- bearing" handles the counter-clockwise 3D rotation vs clockwise Map rotation.
+          busModelRef.current.setRotation({ x: 0, y: 0, z: 270 - bearing });
+        }
+
+        if (mapRef.current) {
+          mapRef.current.easeTo({
+            center: currentCoord,
+            duration: 50,
+            easing: (n) => n,
+          });
+        }
+
+        counter++;
+        animationRef.current = requestAnimationFrame(animate);
+      }
+    }
+
+    animate();
   };
-
-  // Simulate incoming socket data for testing
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Create a fake new coordinate slightly different from the last
-      const time = Date.now() / 1000;
-      const newLng = 90.4125 + Math.sin(time) * 0.001;
-      const newLat = 23.8103 + Math.cos(time) * 0.001;
-
-      moveBusTo([newLng, newLat]);
-    }, 1000); // Update every second
-
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <div
       ref={mapContainerRef}
-      style={{ width: "500px", height: "500px", border: "1px solid black" }}
+      style={{ width: "100%", height: "100%", margin: 0, padding: 0 }}
     />
   );
 };
