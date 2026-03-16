@@ -1,13 +1,11 @@
-import * as turf from "@turf/turf"; // For calculating rotation/bearing
+import * as turf from "@turf/turf";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useEffect, useRef } from "react";
-import { Threebox } from "threebox-plugin"; // The bridge between Mapbox and Three.js
+import { Threebox } from "threebox-plugin";
 
-// Token setup
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 
-// Marker data
 const markers = [
   { name: "BUP", coords: [90.35763768635113, 23.839868716065457] },
   { name: "DOHS Gate", coords: [90.375689, 23.837502] },
@@ -22,7 +20,6 @@ const markers = [
   { name: "Jahangir Gate", coords: [90.390039, 23.775774] },
 ];
 
-// Bus Routes
 const routeGeoJSON = {
   type: "Feature",
   properties: {},
@@ -366,28 +363,33 @@ const routeGeoJSON = {
 const BusTracker = () => {
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
-  const busModelRef = useRef(null); // To store the 3D bus instance
-  const animationRef = useRef(null); // To store animation frame ID
-
-  // Example: Starting coordinates (Dhaka coordinates)
+  const busModelRef = useRef(null);
+  const animationRef = useRef(null);
   const startCoords = routeGeoJSON.geometry.coordinates[0];
 
   useEffect(() => {
-    // 1. Initialize Map
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
-      style: "mapbox://styles/mapbox/standard", // Lighter styles make 3D models pop
+      style: "mapbox://styles/mapbox/standard",
       center: startCoords,
       zoom: 18,
-      pitch: 60, // Important: Tilt the map so you can see the 3D effect!
+      pitch: 60,
       bearing: 0,
-      antialias: true, // Crucial for smooth 3D edges
+      antialias: true,
     });
 
     mapRef.current = map;
 
     map.on("style.load", () => {
-      // Add the route line for visualization
+      const layers = map.getStyle().layers;
+      const buildingLayer = layers.find(
+        (layer) => layer.type === "fill-extrusion",
+      );
+
+      if (buildingLayer) {
+        map.setPaintProperty(buildingLayer.id, "fill-extrusion-opacity", 0.5);
+      }
+
       map.addSource("route", {
         type: "geojson",
         data: routeGeoJSON,
@@ -403,16 +405,13 @@ const BusTracker = () => {
         },
       });
 
-      // Add Markers
       markers.forEach((markerInfo) => {
-        // Create a popup that doesn't close
         const popup = new mapboxgl.Popup({
           offset: 25,
           closeButton: false,
           closeOnClick: false,
         }).setText(markerInfo.name);
 
-        // Create the marker and toggle its popup
         const marker = new mapboxgl.Marker({ color: "#FF0000" })
           .setLngLat(markerInfo.coords)
           .setPopup(popup)
@@ -421,42 +420,41 @@ const BusTracker = () => {
         marker.togglePopup();
       });
 
-      // 2. Add the Custom Layer for the 3D Model
       map.addLayer({
         id: "3d-bus-layer",
         type: "custom",
         renderingMode: "3d",
         onAdd: function (map, mbxContext) {
-          // Initialize Threebox
           window.tb = new Threebox(map, mbxContext, { defaultLights: true });
 
-          // 3. Load the 3D Model
           const options = {
-            obj: "/models/bus.glb", // Path to your file in public folder
+            obj: "/models/bus.glb",
             type: "gltf",
-            scale: { x: 0.04, y: 0.04, z: 0.04 }, // Adjust scale if bus is too huge/tiny
-            units: "meters", // Ensures it stays realistic size at all zoom levels
-            rotation: { x: -90, y: 0, z: 180 }, // Corrected orientation
+            scale: { x: 0.04, y: 0.04, z: 0.04 },
+            units: "meters",
+            rotation: { x: -90, y: 0, z: 180 },
             anchor: "center",
           };
 
           window.tb.loadObj(options, (model) => {
+            model.traverse((child) => {
+              if (child.isMesh) {
+                child.material.depthTest = false;
+                child.renderOrder = 9999;
+                child.material.transparent = true;
+              }
+            });
+
             model.setCoords(startCoords);
-            // model.setRotation({ x: 0, y: 0, z: 0 }); // Initial rotation - REMOVED
-
-            // Add tooltip (optional)
             model.addTooltip("Bus #123", true);
-
             window.tb.add(model);
-            busModelRef.current = model; // Save reference to animate later
-
-            // Start the animation
+            busModelRef.current = model;
             animateBus();
           });
         },
 
         render: function () {
-          window.tb.update(); // Essential for Threebox to render every frame
+          window.tb.update();
         },
       });
     });
@@ -467,9 +465,6 @@ const BusTracker = () => {
     };
   }, []);
 
-  // ---------------------------------------------------------
-  // FUNCTION TO MOVE THE BUS SMOOTHLY
-  // ---------------------------------------------------------
   const animateBus = () => {
     const lineDistance = turf.length(routeGeoJSON);
     const steps = 8000;
@@ -495,9 +490,6 @@ const BusTracker = () => {
             turf.point(nextCoord),
           );
 
-          // CORRECTION:
-          // 1. "270" (or -90) orients the West-facing (-X) model to North (0 deg).
-          // 2. "- bearing" handles the counter-clockwise 3D rotation vs clockwise Map rotation.
           busModelRef.current.setRotation({ x: 0, y: 0, z: 270 - bearing });
         }
 
